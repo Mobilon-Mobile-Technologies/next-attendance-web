@@ -8,7 +8,7 @@ const SignInButton = () => {
   const { instance } = useMsal();
 
   const handleSignIn = () => {
-    instance.loginRedirect({
+    instance.loginPopup({
       scopes: ["user.read"],
     });
   };
