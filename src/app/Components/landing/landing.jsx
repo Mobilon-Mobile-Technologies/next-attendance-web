@@ -7,7 +7,7 @@ import {
   useMsal,
 } from "@azure/msal-react";
 import { InteractionType } from "@azure/msal-browser";
-import QrReader from "react-qr-scanner";
+import {QrScanner} from '@yudiel/react-qr-scanner';
 import styles from "./landing.module.css";
 import {
   Modal,
@@ -27,7 +27,8 @@ const Landing = () => {
   const { instance } = useMsal();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [modalheader, setModalHeader] = useState("");
-  const [modaltext, setModalText] = useState("");  
+  const [modaltext, setModalText] = useState("");
+  const [selected, setSelected] = useState("environment");
 
   const { authResult, error } = useMsalAuthentication(InteractionType.Popup, {
     scopes: ["user.read"],
@@ -134,12 +135,13 @@ const Landing = () => {
               </p>
               <div className={styles.qrBox}>
                 <div className={styles.qr}>
-                  <QrReader
+                  <QrScanner
                     delay={100}
                     style={{ width: "100%" }}
                     onError={handleError}
-                    onScan={handleScan}
-                    facingMode="environment"
+                    // onScan={handleScan}
+                    onDecode={(result) => handleScan(result)}
+                    constraints={{facingMode: 'environment'}}
                   />
                 </div>
               </div>
