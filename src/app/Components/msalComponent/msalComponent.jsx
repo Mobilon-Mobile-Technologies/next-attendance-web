@@ -4,11 +4,15 @@ import React, { useEffect } from "react";
 import { MsalProvider, useMsal, useIsAuthenticated } from "@azure/msal-react";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 import Landing from "../landing/landing";
+import NavigationBar from "../navbar/navigationBar";
 
 const MsalComponent = ({ msalInstance }) => {
   return (
     <MsalProvider instance={msalInstance}>
-      <HomePage />
+      <div className="flex-1 ">
+        <NavigationBar />
+        <HomePage />
+      </div>
     </MsalProvider>
   );
 };
@@ -37,7 +41,7 @@ const HomePage = () => {
     }
   }, []);
 
-  return <Landing/>;
+  return <Landing />;
 };
 
 export default MsalComponent;
