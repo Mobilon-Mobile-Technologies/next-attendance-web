@@ -9,13 +9,25 @@ import {
 import { InteractionType } from "@azure/msal-browser";
 import QrReader from "react-qr-scanner";
 import styles from "./landing.module.css";
-import { Divider } from "@nextui-org/react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+  Divider,
+} from "@nextui-org/react";
 
 const Landing = () => {
   const [userData, setUserData] = useState([]);
   const [qrStatus, setQrStatus] = useState(false);
   const isAuthenticated = useIsAuthenticated();
   const { instance } = useMsal();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [modalheader, setModalHeader] = useState("");
+  const [modaltext, setModalText] = useState("");  
 
   const { authResult, error } = useMsalAuthentication(InteractionType.Popup, {
     scopes: ["user.read"],
@@ -29,8 +41,17 @@ const Landing = () => {
         console.log(currentAccount);
         setUserData(currentAccount);
         setQrStatus(true);
+
+        setModalHeader("QR Scan Status")
+        setModalText("You have successfully scanned the QR Code.")
+        onOpen();
       }
     } else {
+
+      setModalHeader("QR Scan Status")
+      setModalText("You are not signed in. Please Sign in and try again.")
+      onOpen();
+
       console.log("User not found");
     }
   };
@@ -50,6 +71,30 @@ const Landing = () => {
 
   return (
     <div className={styles.container}>
+      <Modal
+        isOpen={isOpen}
+        placement="center"
+        onOpenChange={onOpenChange}
+        backdrop={"blur"}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1 text-black">
+                {modalheader}
+              </ModalHeader>
+              <ModalBody>
+                <p>{modaltext}</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       {isAuthenticated ? (
         <div>
           {qrStatus ? (
@@ -65,15 +110,21 @@ const Landing = () => {
                 </div>
                 <Divider className="my-4" />
                 <div className="flex-1 h-5 items-center text-small">
-                  <div style={{ fontSize: 13}}> Name: {userData?.name}</div>
-                  <div style={{marginTop: 5, fontSize: 13}}>Email: {userData?.username}</div>
-                  <div style={{marginTop: 5, fontSize: 13}}> Course Code: CSET 301</div>
-                  <div style={{marginTop: 5, fontSize: 13}}> Class: Statistical Machine Learning</div>
-                  <div style={{marginTop: 5, fontSize: 13}}> Faculty: Dr. XYZ </div>
+                  <div style={{ fontSize: 13 }}> Name: {userData?.name}</div>
+                  <div style={{ marginTop: 5, fontSize: 13 }}>
+                    Email: {userData?.username}
+                  </div>
+                  <div style={{ marginTop: 5, fontSize: 13 }}>
+                    Course Code: CSET 301
+                  </div>
+                  <div style={{ marginTop: 5, fontSize: 13 }}>
+                    Class: Statistical Machine Learning
+                  </div>
+                  <div style={{ marginTop: 5, fontSize: 13 }}>
+                    Faculty: Dr. XYZ{" "}
+                  </div>
                 </div>
               </div>
-
-
             </div>
           ) : (
             <div>
