@@ -1,52 +1,76 @@
-'use client'
+"use client";
 
-import React,{useEffect, useState} from 'react'
+import React, { useEffect, useState } from "react";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
   useMsalAuthentication,
+  useIsAuthenticated,
+  useMsal
 } from "@azure/msal-react";
 import { InteractionType } from "@azure/msal-browser";
-import axios from 'axios';
+import axios from "axios";
+import QrReader from "react-qr-scanner";
 
 const Landing = () => {
+  const [userData, setUserData] = useState([]);
+  const [qrStatus, setQrStatus] = useState(false);
+  const isAuthenticated = useIsAuthenticated();
+  const {instance}=useMsal();
 
-  const [userData,setUserData]=useState([])
-
-  
-
-  const { result, error } = useMsalAuthentication(InteractionType.Popup, {
+  const { authResult, error } = useMsalAuthentication(InteractionType.Popup, {
     scopes: ["user.read"],
   });
 
 
-  useEffect(()=>{
+const checkUser=()=>{
+  if(isAuthenticated){
+    const currentAccount=instance.getActiveAccount();
 
-    // const retrieveUserData=async()=>{
+    if(currentAccount){
+        console.log(currentAccount);
+        setUserData(currentAccount);
+        setQrStatus(true);
+    }
+  }
+  else{
+    console.log('User not found')
+  }
 
-    //   if(result){
-    //     // console.log(result)
-  
-    //     const {accessToken}=result;
-    //     const response =await axios.get("https://graph.microsoft.com/v1.0/me", accessToken);
-
-    //     console.log(response);
-
-    //     setUserData(response)
-    //   }
-
-    // }
-
-    // retrieveUserData();
-
-    console.log(result)
-
-  },[])
-
-
-  return (
-    <div>Landing</div>
-  )
 }
 
-export default Landing
+  
+  const handleError = (error) => {
+    console.log(error);
+  };
+
+  const handleScan = (result) => {
+    if (result) {
+      console.log("qr found");
+      checkUser();
+
+    } else {  
+      console.log("no qr found yet");
+    }
+  };
+
+  return (
+    <div>
+      Landing
+      <div>
+        {qrStatus ? (
+          <div>QR Scanned</div>
+        ) : (
+          <QrReader
+            delay={100}
+            style={{ width: "100%" }}
+            onError={handleError}
+            onScan={handleScan}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Landing;
