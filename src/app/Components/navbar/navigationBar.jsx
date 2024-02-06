@@ -23,11 +23,11 @@ const NavigationBar = () => {
       <NavbarBrand>
         <Image src='/assets/uni_logo.png' height={140} width={140} alt="univeristy_logo"/>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      {/* <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
-         <p className="text-inherit text-2xl font-medium text-gray">Student Attendance Portal</p>
+         <p className="text-inherit text-2xl font-medium text-gray">Attendance Portal</p>
         </NavbarItem>
-      </NavbarContent>
+      </NavbarContent> */}
       <NavbarContent justify="end">
         <NavbarItem>
           {isAuthenticated ? <SignOutButton /> : <SignInButton />}

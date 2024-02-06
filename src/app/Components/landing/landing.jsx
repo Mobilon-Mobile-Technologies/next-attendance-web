@@ -9,6 +9,7 @@ import {
 import { InteractionType } from "@azure/msal-browser";
 import QrReader from "react-qr-scanner";
 import styles from "./landing.module.css";
+import { Divider } from "@nextui-org/react";
 
 const Landing = () => {
   const [userData, setUserData] = useState([]);
@@ -52,10 +53,34 @@ const Landing = () => {
       {isAuthenticated ? (
         <div>
           {qrStatus ? (
-            <div>QR Scanned</div>
+            <div>
+              <div className={styles.heading}>Attendance Details:</div>
+
+              <div className="max-w-md">
+                <div className="space-y-1">
+                  {/* <h4 className="text-medium font-medium">Attendance Details:</h4> */}
+                  <p className="text-small text-green-500">
+                    Your Attendance has been marked !
+                  </p>
+                </div>
+                <Divider className="my-4" />
+                <div className="flex-1 h-5 items-center text-small">
+                  <div style={{ fontSize: 13}}> Name: {userData?.name}</div>
+                  <div style={{marginTop: 5, fontSize: 13}}>Email: {userData?.username}</div>
+                  <div style={{marginTop: 5, fontSize: 13}}> Course Code: CSET 301</div>
+                  <div style={{marginTop: 5, fontSize: 13}}> Class: Statistical Machine Learning</div>
+                  <div style={{marginTop: 5, fontSize: 13}}> Faculty: Dr. XYZ </div>
+                </div>
+              </div>
+
+
+            </div>
           ) : (
             <div>
               <h1 className={styles.heading}>Scan the QR</h1>
+              <p className={styles.subHeading}>
+                Hold the camera still for the scanner to work properly
+              </p>
               <div className={styles.qrBox}>
                 <div className={styles.qr}>
                   <QrReader
