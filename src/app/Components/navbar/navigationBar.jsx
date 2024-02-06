@@ -21,8 +21,7 @@ const NavigationBar = () => {
   return (
     <Navbar>
       <NavbarBrand>
-        <Image src='/assets/uni_logo.png' height={130} width={130} alt="univeristy_logo"/>
-        {/* <p className="font-bold text-inherit">ACME</p> */}
+        <Image src='/assets/uni_logo.png' height={140} width={140} alt="univeristy_logo"/>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>

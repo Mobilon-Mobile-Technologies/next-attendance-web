@@ -1,0 +1,37 @@
+.container{
+    margin-left: 25px;
+    margin-top: 40px;
+    margin-right: 25px;
+}
+
+
+.notLoggedIn{
+    /* background-color: red; */
+    justify-content: center;
+    display: flex;
+}
+
+.qrBox{
+    border: 20px;
+    padding: 40px 40px 40px 40px;
+    background-color: #f3f3f3;
+    margin-top: 30px;
+    border-width:medium;
+    border-color: black;
+    border-radius: 2%;
+    
+
+}
+
+.qr{
+    justify-content: center;
+    display: flex;
+    /* margin-top: 30px; */
+}
+
+.heading {
+    font-size: 30px;
+    font-weight: 600;
+    /* color: grey; */
+}
+

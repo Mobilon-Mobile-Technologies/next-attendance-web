@@ -7,12 +7,12 @@ import {
   useMsal,
 } from "@azure/msal-react";
 import { InteractionType } from "@azure/msal-browser";
-import axios from "axios";
 import QrReader from "react-qr-scanner";
+import styles from "./landing.module.css";
 
 const Landing = () => {
   const [userData, setUserData] = useState([]);
-  const [qrStatus, setQrStatus] = useState(true);
+  const [qrStatus, setQrStatus] = useState(false);
   const isAuthenticated = useIsAuthenticated();
   const { instance } = useMsal();
 
@@ -48,22 +48,31 @@ const Landing = () => {
   };
 
   return (
-    <div className="ml-6 mt-4">
+    <div className={styles.container}>
       {isAuthenticated ? (
         <div>
           {qrStatus ? (
             <div>QR Scanned</div>
           ) : (
-            <QrReader
-              delay={100}
-              style={{ width: "100%" }}
-              onError={handleError}
-              onScan={handleScan}
-            />
+            <div>
+              <h1 className={styles.heading}>Scan the QR</h1>
+              <div className={styles.qrBox}>
+                <div className={styles.qr}>
+                  <QrReader
+                    delay={100}
+                    style={{ width: "100%" }}
+                    onError={handleError}
+                    onScan={handleScan}
+                  />
+                </div>
+              </div>
+            </div>
           )}
         </div>
       ) : (
-        <div>NOT SIGNED IN</div>
+        <div className={styles.notLoggedIn}>
+          <div>You are not Logged In. Sign In to mark your Attendance.</div>
+        </div>
       )}
     </div>
   );
