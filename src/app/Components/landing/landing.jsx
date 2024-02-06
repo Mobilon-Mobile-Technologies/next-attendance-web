@@ -139,6 +139,7 @@ const Landing = () => {
                     style={{ width: "100%" }}
                     onError={handleError}
                     onScan={handleScan}
+                    facingMode="rear"
                   />
                 </div>
               </div>
