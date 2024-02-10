@@ -7,7 +7,7 @@ import {
   useMsal,
 } from "@azure/msal-react";
 import { InteractionType } from "@azure/msal-browser";
-import {QrScanner} from '@yudiel/react-qr-scanner';
+import { QrScanner } from "@yudiel/react-qr-scanner";
 import styles from "./landing.module.css";
 import {
   Modal,
@@ -43,14 +43,13 @@ const Landing = () => {
         setUserData(currentAccount);
         setQrStatus(true);
 
-        setModalHeader("QR Scan Status")
-        setModalText("You have successfully scanned the QR Code.")
-        onOpen();
+        // setModalHeader("QR Scan Status");
+        // setModalText("You have successfully scanned the QR Code.");
+        // onOpen();
       }
     } else {
-
-      setModalHeader("QR Scan Status")
-      setModalText("You are not signed in. Please Sign in and try again.")
+      setModalHeader("QR Scan Status");
+      setModalText("You are not signed in. Please Sign in and try again.");
       onOpen();
 
       console.log("User not found");
@@ -65,8 +64,70 @@ const Landing = () => {
     if (result) {
       console.log("qr found");
       checkUser();
+      console.log(result);
+
+      const token=getTokenFromUrl(result);
+
+      checkTokenValidity(token);
+
     } else {
       console.log("no qr found yet");
+    }
+  };
+
+  
+  const getTokenFromUrl = (url) => {
+    const queryString = url.split("?")[1];
+    if (queryString) {
+      const queryParams = queryString.split("&");
+
+      for (const param of queryParams) {
+        const [key, value] = param.split("=");
+        if (key === "token") {
+          return value;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const checkTokenValidity = async (token) => {
+    try {
+      const response = await fetch(
+        `https://sixc1f0487-145f-4e33-8897-641d33f1d0e6.onrender.com/check_status/${token}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.status);
+
+        if (data.status === "valid") {
+          
+          setModalHeader("QR Scan Status");
+          setModalText("You have successfully scanned a Valid QR Code");
+          onOpen();
+
+        } else if (data.status === "expired") {
+          // console.log("invalid URL couldnt proceed further");
+
+          setModalHeader("QR Scan Status");
+          setModalText("You have successfully scanned the QR Code.");
+          onOpen();
+
+          setQrStatus(false);
+        }
+      } else {
+        throw new Error("Network response was not ok.");
+      }
+    } catch (error) {
+      console.error("Error during token validity check:", error);
     }
   };
 
@@ -141,7 +202,7 @@ const Landing = () => {
                     onError={handleError}
                     // onScan={handleScan}
                     onDecode={(result) => handleScan(result)}
-                    constraints={{facingMode: 'environment'}}
+                    constraints={{ facingMode: "environment" }}
                   />
                 </div>
               </div>
