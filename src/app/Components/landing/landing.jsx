@@ -114,7 +114,7 @@ const Landing = () => {
           setModalText("You have successfully scanned a Valid QR Code");
           onOpen();
 
-        } else if (data.status === "invalid") {
+        } else{
           // console.log("invalid URL couldnt proceed further");
 
           setModalHeader("QR Scan Status");
