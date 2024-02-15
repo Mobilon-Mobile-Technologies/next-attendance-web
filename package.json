@@ -12,6 +12,7 @@
     "@azure/msal-browser": "^3.7.1",
     "@azure/msal-react": "^2.0.10",
     "@nextui-org/react": "^2.2.9",
+    "@supabase/supabase-js": "^2.39.6",
     "@yudiel/react-qr-scanner": "^1.2.6",
     "axios": "^1.6.7",
     "framer-motion": "^11.0.3",

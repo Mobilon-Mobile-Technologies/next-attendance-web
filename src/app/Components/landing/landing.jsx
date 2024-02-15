@@ -20,6 +20,8 @@ import {
   Divider,
 } from "@nextui-org/react";
 
+import supabase from "../../../../supabase";
+
 const Landing = () => {
   const [userData, setUserData] = useState([]);
   const [qrStatus, setQrStatus] = useState(false);
@@ -46,6 +48,8 @@ const Landing = () => {
         // setModalHeader("QR Scan Status");
         // setModalText("You have successfully scanned the QR Code.");
         // onOpen();
+
+        return currentAccount;
       }
     } else {
       setModalHeader("QR Scan Status");
@@ -54,6 +58,7 @@ const Landing = () => {
 
       console.log("User not found");
     }
+
   };
 
   const handleError = (error) => {
@@ -63,19 +68,17 @@ const Landing = () => {
   const handleScan = (result) => {
     if (result) {
       console.log("qr found");
-      checkUser();
+      const userdata=checkUser();
       console.log(result);
 
-      const token=getTokenFromUrl(result);
+      const token = getTokenFromUrl(result);
 
-      checkTokenValidity(token);
-
+      checkTokenValidity(token,userdata);
     } else {
       console.log("no qr found yet");
     }
   };
 
-  
   const getTokenFromUrl = (url) => {
     const queryString = url.split("?")[1];
     if (queryString) {
@@ -92,7 +95,7 @@ const Landing = () => {
     return null;
   };
 
-  const checkTokenValidity = async (token) => {
+  const checkTokenValidity = async (token,userdata) => {
     try {
       const response = await fetch(
         `https://sixc1f0487-145f-4e33-8897-641d33f1d0e6.onrender.com/check_status/${token}`,
@@ -104,17 +107,24 @@ const Landing = () => {
         }
       );
 
+      
+
       if (response.ok) {
         const data = await response.json();
         console.log(data.status);
 
+        
+
         if (data.status === "valid") {
           
+          updateData(userdata);
+
           setModalHeader("QR Scan Status");
           setModalText("You have successfully scanned a Valid QR Code");
           onOpen();
 
-        } else{
+          
+        } else {
           // console.log("invalid URL couldnt proceed further");
 
           setModalHeader("QR Scan Status");
@@ -128,6 +138,20 @@ const Landing = () => {
       }
     } catch (error) {
       console.error("Error during token validity check:", error);
+    }
+  };
+
+  const updateData = async (userdata) => {
+    try {
+      const { data, error } = await supabase
+        .from("attendance_log")
+        .insert([{ name: userdata?.name, email: userdata?.username }])
+        .select();
+
+      console.log(data);
+
+    } catch (err) {
+      console.log(err);
     }
   };
 
