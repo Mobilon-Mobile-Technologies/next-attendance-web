@@ -71,7 +71,7 @@ const Landing = () => {
       const userdata=checkUser();
       console.log(result);
 
-      const token = getTokenFromUrl(result);
+      const { token, coursecode } = getTokenFromUrl(result);
 
       checkTokenValidity(token,userdata);
     } else {
@@ -82,18 +82,34 @@ const Landing = () => {
   const getTokenFromUrl = (url) => {
     const queryString = url.split("?")[1];
     if (queryString) {
-      const queryParams = queryString.split("&");
+        const queryParams = queryString.split("&");
+        let token = null;
+        let coursecode = null;
 
-      for (const param of queryParams) {
-        const [key, value] = param.split("=");
-        if (key === "token") {
-          return value;
+        for (const param of queryParams) {
+            const [key, value] = param.split("=");
+            if (key === "token") {
+                token = value;
+            } else if (key === "coursecode") {
+                coursecode = value;
+            }
         }
-      }
+
+        if (token) {
+            console.log("Token:", token);
+        }
+
+        if (coursecode) {
+            console.log("Course Code:", coursecode);
+        }
+
+        return { token, coursecode };
     }
 
     return null;
-  };
+};
+
+
 
   const checkTokenValidity = async (token,userdata) => {
     try {
@@ -204,7 +220,7 @@ const Landing = () => {
                     Course Code: CSET 301
                   </div>
                   <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Class: Statistical Machine Learning
+                    Class: {coursecode}
                   </div>
                   <div style={{ marginTop: 5, fontSize: 13 }}>
                     Faculty: Dr. XYZ{" "}
