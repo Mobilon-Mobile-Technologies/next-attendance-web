@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import {
   useMsalAuthentication,
@@ -25,6 +23,7 @@ import supabase from "../../../../supabase";
 const Landing = () => {
   const [userData, setUserData] = useState([]);
   const [qrStatus, setQrStatus] = useState(false);
+  const [coursecode, setCoursecode] = useState(""); // Define coursecode state
   const isAuthenticated = useIsAuthenticated();
   const { instance } = useMsal();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -45,10 +44,6 @@ const Landing = () => {
         setUserData(currentAccount);
         setQrStatus(true);
 
-        // setModalHeader("QR Scan Status");
-        // setModalText("You have successfully scanned the QR Code.");
-        // onOpen();
-
         return currentAccount;
       }
     } else {
@@ -58,7 +53,6 @@ const Landing = () => {
 
       console.log("User not found");
     }
-
   };
 
   const handleError = (error) => {
@@ -68,12 +62,13 @@ const Landing = () => {
   const handleScan = (result) => {
     if (result) {
       console.log("qr found");
-      const userdata=checkUser();
+      const userdata = checkUser();
       console.log(result);
 
       const { token, coursecode } = getTokenFromUrl(result);
+      setCoursecode(coursecode); // Set coursecode in the state
 
-      checkTokenValidity(token,userdata);
+      checkTokenValidity(token, userdata);
     } else {
       console.log("no qr found yet");
     }
@@ -82,36 +77,34 @@ const Landing = () => {
   const getTokenFromUrl = (url) => {
     const queryString = url.split("?")[1];
     if (queryString) {
-        const queryParams = queryString.split("&");
-        let token = null;
-        let coursecode = null;
+      const queryParams = queryString.split("&");
+      let token = null;
+      let coursecode = null;
 
-        for (const param of queryParams) {
-            const [key, value] = param.split("=");
-            if (key === "token") {
-                token = value;
-            } else if (key === "coursecode") {
-                coursecode = value;
-            }
+      for (const param of queryParams) {
+        const [key, value] = param.split("=");
+        if (key === "token") {
+          token = value;
+        } else if (key === "coursecode") {
+          coursecode = value;
         }
+      }
 
-        if (token) {
-            console.log("Token:", token);
-        }
+      if (token) {
+        console.log("Token:", token);
+      }
 
-        if (coursecode) {
-            console.log("Course Code:", coursecode);
-        }
+      if (coursecode) {
+        console.log("Course Code:", coursecode);
+      }
 
-        return { token, coursecode };
+      return { token, coursecode };
     }
 
     return null;
-};
+  };
 
-
-
-  const checkTokenValidity = async (token,userdata) => {
+  const checkTokenValidity = async (token, userdata) => {
     try {
       const response = await fetch(
         `https://sixc1f0487-145f-4e33-8897-641d33f1d0e6.onrender.com/check_status/${token}`,
@@ -123,26 +116,17 @@ const Landing = () => {
         }
       );
 
-      
-
       if (response.ok) {
         const data = await response.json();
         console.log(data.status);
 
-        
-
         if (data.status === "valid") {
-          
           updateData(userdata);
 
           setModalHeader("QR Scan Status");
           setModalText("You have successfully scanned a Valid QR Code");
           onOpen();
-
-          
         } else {
-          // console.log("invalid URL couldnt proceed further");
-
           setModalHeader("QR Scan Status");
           setModalText("You have scanned an Invalid QR Code. Try Again !");
           onOpen();
@@ -165,7 +149,6 @@ const Landing = () => {
         .select();
 
       console.log(data);
-
     } catch (err) {
       console.log(err);
     }
@@ -205,7 +188,6 @@ const Landing = () => {
 
               <div className="max-w-md">
                 <div className="space-y-1">
-                  {/* <h4 className="text-medium font-medium">Attendance Details:</h4> */}
                   <p className="text-small text-green-500">
                     Your Attendance has been marked !
                   </p>
