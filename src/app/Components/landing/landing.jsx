@@ -199,9 +199,6 @@ const Landing = () => {
                     Email: {userData?.username}
                   </div>
                   <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Course Code: CSET 301
-                  </div>
-                  <div style={{ marginTop: 5, fontSize: 13 }}>
                     Class: {coursecode}
                   </div>
                   <div style={{ marginTop: 5, fontSize: 13 }}>
