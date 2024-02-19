@@ -18,13 +18,13 @@ import {
   Divider,
 } from "@nextui-org/react";
 
-
 import supabase from "../../../../supabase";
 
 const Landing = () => {
   const [userData, setUserData] = useState([]);
   const [qrStatus, setQrStatus] = useState(false);
-  const [coursecode, setCoursecode] = useState(""); // Define coursecode state
+  const [courseId, setCourseId] = useState("");
+  const [groupId, setGroupId] = useState("");
   const isAuthenticated = useIsAuthenticated();
   const { instance } = useMsal();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -67,9 +67,8 @@ const Landing = () => {
       console.log(result);
 
       const { token, coursecode } = getTokenFromUrl(result);
-      setCoursecode(coursecode); // Set coursecode in the state
 
-      checkTokenValidity(token, userdata);
+      checkTokenValidity(token, userdata, coursecode);
     } else {
       console.log("no qr found yet");
     }
@@ -105,7 +104,7 @@ const Landing = () => {
     return null;
   };
 
-  const checkTokenValidity = async (token, userdata) => {
+  const checkTokenValidity = async (token, userdata, coursecode) => {
     try {
       const response = await fetch(
         `https://sixc1f0487-145f-4e33-8897-641d33f1d0e6.onrender.com/check_status/${token}`,
@@ -122,7 +121,7 @@ const Landing = () => {
         console.log(data.status);
 
         if (data.status === "valid") {
-          updateData(userdata);
+          updateData(userdata, coursecode);
 
           setModalHeader("QR Scan Status");
           setModalText("You have successfully scanned a Valid QR Code");
@@ -142,14 +141,34 @@ const Landing = () => {
     }
   };
 
-  const updateData = async (userdata) => {
+  const updateData = async (userdata, coursecode) => {
+    console.log(coursecode);
+    const [course_id, group_id] = coursecode.split("-");
+    setGroupId(group_id);
+    setCourseId(course_id);
+
     try {
       const { data, error } = await supabase
-        .from("attendance_log")
-        .insert([{ name: userdata?.name, email: userdata?.username }])
-        .select();
+        .from("students_table")
+        .select("*")
+        .eq("group_name", group_id);
 
-      console.log(data);
+      const total_attendance = data[0].group_attendance;
+
+
+      total_attendance.map((item) => {
+        if (item.Course_id === course_id) {
+          console.log(item.Attendance);
+
+        }
+
+        return null;
+      });
+
+      const today = new Date();
+      console.log(today.getDate);
+
+
     } catch (err) {
       console.log(err);
     }
@@ -200,7 +219,7 @@ const Landing = () => {
                     Email: {userData?.username}
                   </div>
                   <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Course Code: {coursecode}
+                    Course Code: {courseId}
                   </div>
                   {/* <div style={{ marginTop: 5, fontSize: 13 }}>
                     Class: 
