@@ -111,7 +111,7 @@ const Landing = () => {
     return null;
   };
 
-  const checkTokenValidity = async (token, userdata, coursecode) => {
+  const checkTokenValidity = async (token, userdata, coursecode, groupcode) => {
     try {
       const response = await fetch(
         `https://sixc1f0487-145f-4e33-8897-641d33f1d0e6.onrender.com/check_status/${token}`,
@@ -128,7 +128,7 @@ const Landing = () => {
         console.log(data.status);
 
         if (data.status === "valid") {
-          updateData(userdata, coursecode, token);
+          updateData(userdata, coursecode, groupcode, token);
 
           setModalHeader("QR Scan Status");
           setModalText("You have successfully scanned a Valid QR Code");
@@ -148,10 +148,9 @@ const Landing = () => {
     }
   };
 
-  const updateData = async (userdata, coursecode, token) => {
-    const [course_id, group_id] = coursecode.split("-");
-    setGroupId(group_id);
-    setCourseId(course_id);
+  const updateData = async (userdata, coursecode, groupcode,  token) => {
+    setGroupId(groupcode);
+    setCourseId(coursecode);
 
     try {
       const response = await fetch(
@@ -176,8 +175,8 @@ const Landing = () => {
               {
                 student_name: userdata.name,
                 student_email: userdata.username,
-                group_name: group_id,
-                course_id: course_id,
+                group_name: groupcode,
+                course_id: coursecode,
               },
             ]);
 
