@@ -18,6 +18,7 @@ import {
   Divider,
 } from "@nextui-org/react";
 
+
 import supabase from "../../../../supabase";
 
 const Landing = () => {
@@ -199,11 +200,14 @@ const Landing = () => {
                     Email: {userData?.username}
                   </div>
                   <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Class: {coursecode}
+                    Course Code: {coursecode}
                   </div>
-                  <div style={{ marginTop: 5, fontSize: 13 }}>
+                  {/* <div style={{ marginTop: 5, fontSize: 13 }}>
+                    Class: 
+                  </div> */}
+                  {/* <div style={{ marginTop: 5, fontSize: 13 }}>
                     Faculty: Dr. XYZ{" "}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
