@@ -16,6 +16,7 @@ import {
   Button,
   useDisclosure,
   Divider,
+  Spinner,
 } from "@nextui-org/react";
 
 import supabase from "../../../../supabase";
@@ -31,6 +32,7 @@ const Landing = () => {
   const [modalheader, setModalHeader] = useState("");
   const [modaltext, setModalText] = useState("");
   const [selected, setSelected] = useState("environment");
+  const [loading, setLoading] = useState(false);
 
   const { authResult, error } = useMsalAuthentication(InteractionType.Popup, {
     scopes: ["user.read"],
@@ -66,8 +68,8 @@ const Landing = () => {
       const userdata = checkUser();
       console.log(result);
 
-      const { token, coursecode, groupcode } = getTokenFromUrl(result)
-      
+      const { token, coursecode, groupcode } = getTokenFromUrl(result);
+
       checkTokenValidity(token, userdata, coursecode, groupcode);
     } else {
       console.log("no qr found yet");
@@ -128,6 +130,7 @@ const Landing = () => {
         console.log(data.status);
 
         if (data.status === "valid") {
+          setLoading(true);
           updateData(userdata, coursecode, groupcode, token);
 
           setModalHeader("QR Scan Status");
@@ -152,7 +155,7 @@ const Landing = () => {
     setGroupId(groupcode);
     setCourseId(coursecode);
     console.log(groupcode);
-    console.log(coursecode);  
+    console.log(coursecode);
 
     try {
       const { data: savedData, error: saveError } = await supabase
@@ -171,6 +174,7 @@ const Landing = () => {
       }
 
       console.log("Data saved to Supabase:", savedData);
+      setLoading(false);
     } catch (error) {
       console.error("Error during token validity check:", error);
     }
@@ -206,28 +210,37 @@ const Landing = () => {
         <div>
           {qrStatus ? (
             <div>
-              <div className={styles.heading}>Attendance Details:</div>
+              {loading ? (
+                <Spinner />
+              ) : (
+                <div>
+                  <div className={styles.heading}>Attendance Details:</div>
 
-              <div className="max-w-md">
-                <div className="space-y-1">
-                  <p className="text-small text-green-500">
-                    Your Attendance has been marked !
-                  </p>
+                  <div className="max-w-md">
+                    <div className="space-y-1">
+                      <p className="text-small text-green-500">
+                        Your Attendance has been marked !
+                      </p>
+                    </div>
+                    <Divider className="my-4" />
+                    <div className="flex-1 h-5 items-center text-small">
+                      <div style={{ fontSize: 13 }}>
+                        {" "}
+                        Name: {userData?.name}
+                      </div>
+                      <div style={{ marginTop: 5, fontSize: 13 }}>
+                        Email: {userData?.username}
+                      </div>
+                      <div style={{ marginTop: 5, fontSize: 13 }}>
+                        Course Code: {courseId}
+                      </div>
+                      <div style={{ marginTop: 5, fontSize: 13 }}>
+                        Group: {groupId}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <Divider className="my-4" />
-                <div className="flex-1 h-5 items-center text-small">
-                  <div style={{ fontSize: 13 }}> Name: {userData?.name}</div>
-                  <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Email: {userData?.username}
-                  </div>
-                  <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Course Code: {courseId}
-                  </div>
-                  <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Group: {groupId}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           ) : (
             <div>
