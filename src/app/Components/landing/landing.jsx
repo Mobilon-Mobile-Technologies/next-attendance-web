@@ -80,6 +80,7 @@ const Landing = () => {
       const queryParams = queryString.split("&");
       let token = null;
       let coursecode = null;
+      let groupcode = null;
 
       for (const param of queryParams) {
         const [key, value] = param.split("=");
@@ -87,6 +88,8 @@ const Landing = () => {
           token = value;
         } else if (key === "coursecode") {
           coursecode = value;
+        } else if (key === "groupcode") {
+          groupcode = value;
         }
       }
 
@@ -98,7 +101,11 @@ const Landing = () => {
         console.log("Course Code:", coursecode);
       }
 
-      return { token, coursecode };
+      if (groupcode) {
+        console.log("Group Code:", groupcode);
+      }
+
+      return { token, coursecode, groupcode };
     }
 
     return null;
@@ -121,7 +128,7 @@ const Landing = () => {
         console.log(data.status);
 
         if (data.status === "valid") {
-          updateData(userdata, coursecode);
+          updateData(userdata, coursecode, token);
 
           setModalHeader("QR Scan Status");
           setModalText("You have successfully scanned a Valid QR Code");
@@ -141,36 +148,60 @@ const Landing = () => {
     }
   };
 
-  const updateData = async (userdata, coursecode) => {
-    console.log(coursecode);
+  const updateData = async (userdata, coursecode, token) => {
     const [course_id, group_id] = coursecode.split("-");
     setGroupId(group_id);
     setCourseId(course_id);
 
     try {
-      const { data, error } = await supabase
-        .from("students_table")
-        .select("*")
-        .eq("group_name", group_id);
-
-      const total_attendance = data[0].group_attendance;
-
-
-      total_attendance.map((item) => {
-        if (item.Course_id === course_id) {
-          console.log(item.Attendance);
-
+      const response = await fetch(
+        `https://sixc1f0487-145f-4e33-8897-641d33f1d0e6.onrender.com/check_status/${token}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
+      );
 
-        return null;
-      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.status);
 
-      const today = new Date();
-      console.log(today.getDate);
+        if (data.status === "valid") {
+          // Save data to Supabase
+          const { data: savedData, error: saveError } = await supabase
+            .from("attendance")
+            .insert([
+              {
+                student_name: userdata.name,
+                student_email: userdata.username,
+                group_name: group_id,
+                course_id: course_id,
+              },
+            ]);
 
+          if (saveError) {
+            throw new Error("Error saving data to Supabase:", saveError.message);
+          }
 
-    } catch (err) {
-      console.log(err);
+          console.log("Data saved to Supabase:", savedData);
+
+          setModalHeader("QR Scan Status");
+          setModalText("You have successfully scanned a Valid QR Code. Data saved.");
+          onOpen();
+        } else {
+          setModalHeader("QR Scan Status");
+          setModalText("You have scanned an Invalid QR Code. Try Again !");
+          onOpen();
+
+          setQrStatus(false);
+        }
+      } else {
+        throw new Error("Network response was not ok.");
+      }
+    } catch (error) {
+      console.error("Error during token validity check:", error);
     }
   };
 
@@ -221,12 +252,9 @@ const Landing = () => {
                   <div style={{ marginTop: 5, fontSize: 13 }}>
                     Course Code: {courseId}
                   </div>
-                  {/* <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Class: 
-                  </div> */}
-                  {/* <div style={{ marginTop: 5, fontSize: 13 }}>
-                    Faculty: Dr. XYZ{" "}
-                  </div> */}
+                  <div style={{ marginTop: 5, fontSize: 13 }}>
+                    Group: {groupId}
+                  </div>
                 </div>
               </div>
             </div>
