@@ -66,9 +66,9 @@ const Landing = () => {
       const userdata = checkUser();
       console.log(result);
 
-      const { token, coursecode } = getTokenFromUrl(result);
-
-      checkTokenValidity(token, userdata, coursecode);
+      const { token, coursecode, groupcode } = getTokenFromUrl(result)
+      
+      checkTokenValidity(token, userdata, coursecode, groupcode);
     } else {
       console.log("no qr found yet");
     }
@@ -148,57 +148,29 @@ const Landing = () => {
     }
   };
 
-  const updateData = async (userdata, coursecode, groupcode,  token) => {
+  const updateData = async (userdata, coursecode, groupcode, token) => {
     setGroupId(groupcode);
     setCourseId(coursecode);
+    console.log(groupcode);
+    console.log(coursecode);  
 
     try {
-      const response = await fetch(
-        `https://sixc1f0487-145f-4e33-8897-641d33f1d0e6.onrender.com/check_status/${token}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
+      const { data: savedData, error: saveError } = await supabase
+        .from("attendance")
+        .insert([
+          {
+            student_name: userdata.name,
+            student_email: userdata.username,
+            group_name: groupcode,
+            course_id: coursecode,
           },
-        }
-      );
+        ]);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.status);
-
-        if (data.status === "valid") {
-          // Save data to Supabase
-          const { data: savedData, error: saveError } = await supabase
-            .from("attendance")
-            .insert([
-              {
-                student_name: userdata.name,
-                student_email: userdata.username,
-                group_name: groupcode,
-                course_id: coursecode,
-              },
-            ]);
-
-          if (saveError) {
-            throw new Error("Error saving data to Supabase:", saveError.message);
-          }
-
-          console.log("Data saved to Supabase:", savedData);
-
-          setModalHeader("QR Scan Status");
-          setModalText("You have successfully scanned a Valid QR Code. Data saved.");
-          onOpen();
-        } else {
-          setModalHeader("QR Scan Status");
-          setModalText("You have scanned an Invalid QR Code. Try Again !");
-          onOpen();
-
-          setQrStatus(false);
-        }
-      } else {
-        throw new Error("Network response was not ok.");
+      if (saveError) {
+        throw new Error("Error saving data to Supabase:", saveError.message);
       }
+
+      console.log("Data saved to Supabase:", savedData);
     } catch (error) {
       console.error("Error during token validity check:", error);
     }
