@@ -268,9 +268,9 @@ const Landing = () => {
               <input
                 type="range"
                 min="1"
-                max="200"
+                max="1000"
                 value={zoomLevel}
-                onChange={(e) => setZoomLevel(e.target.value)}
+                onChange={(e) => setZoomLevel(parseFloat(e.target.value))}
               />
             </div>
           )}
