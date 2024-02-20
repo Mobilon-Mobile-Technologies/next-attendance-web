@@ -33,6 +33,7 @@ const Landing = () => {
   const [modaltext, setModalText] = useState("");
   const [selected, setSelected] = useState("environment");
   const [loading, setLoading] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1); // Initial zoom level
 
   const { authResult, error } = useMsalAuthentication(InteractionType.Popup, {
     scopes: ["user.read"],
@@ -256,10 +257,21 @@ const Landing = () => {
                     onError={handleError}
                     // onScan={handleScan}
                     onDecode={(result) => handleScan(result)}
-                    constraints={{ facingMode: "environment" }}
+                    constraints={{ 
+                      facingMode: "environment",
+                      zoom: zoomLevel, // Zoom level
+                    }}
                   />
                 </div>
               </div>
+              {/* Add a zoom control */}
+              <input
+                type="range"
+                min="1"
+                max="200"
+                value={zoomLevel}
+                onChange={(e) => setZoomLevel(e.target.value)}
+              />
             </div>
           )}
         </div>
